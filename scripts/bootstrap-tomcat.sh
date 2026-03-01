@@ -9,7 +9,19 @@
 # Log : /var/log/cloud-init-output.log
 # Ship to central logging
 # echo "ok" > /opt/bootstrap.status
-# 
+
+# ###### SUMMARY ######
+# 1. OS Preparation (System update / Java / Tools - tar, unzip, curl)
+# 2. Service User Setup (tomcat / Home Dir / Permissions-Ownership)
+# 3. Tomcat Installation (Download version / Verify / Extract / Ownership normalization)
+# 4. (setenv.sh) JVM + RunTime Configruation (JAVA_Home / Tomcat Catalina Paths / Umask-0027 / Memories / UTF-8)
+# 5. SystemD Service
+# 6. Security Hardening (Default Tomcat Apps-Folders / Disable shutdown port)
+# 7. Deploy Script (Download + Copy)
+# 8. Post install verifications (System Service / TCP:8080 listening / Fail bootstrap if errors)
+
+
+
 
 
 # -e : Exit immediate
