@@ -1,3 +1,13 @@
+# VERIFICATION
+# cloud-init status --long
+# sudo cat /var/log/cloud-init-output.log
+# sudo systemctl status nginx --no-pager
+# curl -I http://localhost
+# sudo nginx -t
+# sudo ss -lntp | egrep ':80|:8080'
+# sudo ls -l /srv/hellowar
+# sudo cat /srv/hellowar/index.html
+
 #!/usr/bin/env bash
 set -euo pipefail
 
