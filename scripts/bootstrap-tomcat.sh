@@ -21,6 +21,27 @@
 # 8. Post install verifications (System Service / TCP:8080 listening / Fail bootstrap if errors)
 
 
+# ########## VERIFICATION ############
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+
+
+
+
+
+
+
 
 
 
@@ -75,7 +96,7 @@ dnf install -y \
 # Check if 'curl' is already installed
 # >/dev/null 2>&1 ---  hides stdout+stderr 
 if ! command -v curl >/dev/null 2>&1; then
-  dnf install -y curl-minimal
+  dnf -y install curl-minimal || dnf -y install curl --allowerasing
 fi
 
 
