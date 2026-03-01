@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-#
+
+# Cloud-init script (cloud-init = service when VM (cloud VM) boots for first time - doesn't run on reboots)
+# User-data - Script/config attached to EC2 at launch
+
+
 # bootstrap-tomcat.sh
 #
 # Phase-1: Turn a fresh Amazon Linux EC2 into a hardened Tomcat 10.1 host
@@ -22,8 +26,8 @@
 
 
 # ########## VERIFICATION ############
-# 
-# 
+# cloud-init status --long        -- check status
+# sudo cat /var/log/cloud-init-output.log     -- check all logs if errors
 # 
 # 
 # 
@@ -62,8 +66,12 @@ DEPLOY_SCRIPT_URL="https://.<PUT THE RAW HTTP URL OF THE DEPLOY.SH FROM PROJ-hel
 
 TOMCAT_VERSION="10.1.49"
 TOMCAT_TGZ="apache-tomcat-${TOMCAT_VERSION}.tar.gz"
-TOMCAT_URL="https://dlcdn.apache.org/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/${TOMCAT_TGZ}"
-TOMCAT_SHA_URL="${TOMCAT_URL}.sha512"
+# Mirror-first (fast) + Archive fallback (reliable)
+TOMCAT_URL_PRIMARY="https://dlcdn.apache.org/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/${TOMCAT_TGZ}"
+TOMCAT_URL_FALLBACK="https://archive.apache.org/dist/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/${TOMCAT_TGZ}"
+
+TOMCAT_SHA_URL_PRIMARY="${TOMCAT_URL_PRIMARY}.sha512"
+TOMCAT_SHA_URL_FALLBACK="${TOMCAT_URL_FALLBACK}.sha512"
 
 
 
@@ -127,8 +135,17 @@ cd /tmp
 
 # -f : fail on HTTP errors | -S : Show error msg | -L : Follow redirects(links) | -o : Output to TOMCAT_TGZ file
 
-curl -fSL -o "${TOMCAT_TGZ}" "${TOMCAT_URL}"
-curl -fSL -o "${TOMCAT_TGZ}.sha512" "${TOMCAT_SHA_URL}"
+# Download tgz
+curl -fSL -o "${TOMCAT_TGZ}" "${TOMCAT_URL_PRIMARY}" || \
+curl -fSL -o "${TOMCAT_TGZ}" "${TOMCAT_URL_FALLBACK}"
+
+# Download sha512
+curl -fSL -o "${TOMCAT_TGZ}.sha512" "${TOMCAT_SHA_URL_PRIMARY}" || \
+curl -fSL -o "${TOMCAT_TGZ}.sha512" "${TOMCAT_SHA_URL_FALLBACK}"
+
+echo "[bootstrap] Verifying checksum..."
+sha512sum -c "${TOMCAT_TGZ}.sha512"
+
 
 # File integrity / not corrupted-tampered
 echo "[bootstrap] Verifying checksum..."
@@ -271,16 +288,16 @@ sleep 2
 
 ## 8) Deploy Script (deploy.sh)
 
-echo "[bootstrap] Creating deploy directory and installing deploy.sh..."
-mkdir -p "${DEPLOY_DIR}"
-chown root:root "${DEPLOY_DIR}"
-chmod 750 "${DEPLOY_DIR}"
+# echo "[bootstrap] Creating deploy directory and installing deploy.sh..."
+# mkdir -p "${DEPLOY_DIR}"
+# chown root:root "${DEPLOY_DIR}"
+# chmod 750 "${DEPLOY_DIR}"
 
-curl -fSL "${DEPLOY_SCRIPT_URL}" -o "${DEPLOY_DIR}/deploy.sh"
-chown root:root "${DEPLOY_DIR}/deploy.sh"
-chmod 700 "${DEPLOY_DIR}/deploy.sh"
+# curl -fSL "${DEPLOY_SCRIPT_URL}" -o "${DEPLOY_DIR}/deploy.sh"
+# chown root:root "${DEPLOY_DIR}/deploy.sh"
+# chmod 700 "${DEPLOY_DIR}/deploy.sh"
 
-echo "[bootstrap] deploy.sh installed at ${DEPLOY_DIR}/deploy.sh"
+# echo "[bootstrap] deploy.sh installed at ${DEPLOY_DIR}/deploy.sh"
 
 
 ## 9) Service status Verification
