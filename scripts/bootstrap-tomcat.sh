@@ -30,6 +30,7 @@
 # sudo cat /var/log/cloud-init-output.log     -- check all logs if errors
 # sudo systemctl status tomcat
 # sudo ss -lntp | grep 8080
+# sudo ss -lntp | egrep ':80|:8080'
 # curl http://localhost:8080/ (maybe not found if no app deployed)
 # curl -I http://localhost:8080/hellowar (once app deployed)
 # 
